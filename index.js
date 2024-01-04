@@ -29,5 +29,14 @@ const employeeTracker = function () {
         ],
       },
     ])
-    .then((answers) => {});
+    .then((answers) => {
+      if (answers.prompt === "View All Employees") {
+        db.query(`SELECT * FROM role`, (err, result) => {
+          if (err) throw err;
+          console.log("Viewing All Employees: ");
+          console.table(result);
+          employeeTracker();
+        });
+      }
+    });
 };
