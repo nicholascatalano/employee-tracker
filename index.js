@@ -18,20 +18,20 @@ const employeeTracker = function () {
         name: "prompt",
         message: "What would you like to do?",
         choices: [
-          "View All Employees",
-          "Add Employee",
-          "Updated Employee Role",
-          "View All Roles",
-          "Add Role",
           "View All Departments",
-          "Add Department",
+          "View All Roles",
+          "View All Employees",
+          "Add a Department",
+          "Add a Role",
+          "Add an Employee",
+          "Update an Employee Role",
           "Quit",
         ],
       },
     ])
     .then((answers) => {
       if (answers.prompt === "View All Employees") {
-        db.query(`SELECT * FROM role`, (err, result) => {
+        db.query(`SELECT * FROM employee`, (err, result) => {
           if (err) throw err;
           console.log("Viewing All Employees: ");
           console.table(result);
