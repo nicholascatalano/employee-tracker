@@ -1,6 +1,6 @@
 // DEPENDENCIES
 const inquirer = require("inquirer");
-const db = require("./db/connection");
+const db = require("./db/connection.js");
 
 // Starts server after connecting to database
 db.connect((err) => {
@@ -9,8 +9,9 @@ db.connect((err) => {
   employeeTracker();
 });
 
-let employeeTracker = function () {
+const employeeTracker = function () {
   inquirer
+    // initial user prompt
     .prompt([
       {
         type: "list",
