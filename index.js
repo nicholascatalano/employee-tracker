@@ -29,14 +29,33 @@ const employeeTracker = function () {
         ],
       },
     ])
-    .then((answers) => {
-      if (answers.prompt === "View All Employees") {
-        db.query(`SELECT * FROM employee`, (err, result) => {
-          if (err) throw err;
-          console.log("Viewing All Employees: ");
-          console.table(result);
-          employeeTracker();
-        });
+    .then((answer) => {
+      switch (answer.action) {
+        case "View all Departments":
+          viewAllDepartments();
+          break;
+        case "View all Roles":
+          viewAllRoles();
+          break;
+        case "View all Employees":
+          viewAllEmployees();
+          break;
+        case "Add a Department":
+          addDepartment();
+          break;
+        case "Add a Role":
+          addRole();
+          break;
+        case "Add an Employee":
+          addEmployee();
+          break;
+        case "Update an Employee Role":
+          updateEmployeeRole();
+          break;
+        case "Exit":
+          connection.end();
+          console.log("Goodbye!");
+          break;
       }
     });
 };
