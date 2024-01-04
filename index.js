@@ -30,14 +30,14 @@ const employeeTracker = function () {
       },
     ])
     .then((answer) => {
-      switch (answer.action) {
-        case "View all Departments":
+      switch (answer.prompt) {
+        case "View All Departments":
           viewAllDepartments();
           break;
-        case "View all Roles":
+        case "View All Roles":
           viewAllRoles();
           break;
-        case "View all Employees":
+        case "View All Employees":
           viewAllEmployees();
           break;
         case "Add a Department":
@@ -54,8 +54,19 @@ const employeeTracker = function () {
           break;
         case "Exit":
           connection.end();
-          console.log("Goodbye!");
+          console.log("Thank you!");
           break;
       }
     });
 };
+
+// function to view all departments
+function viewAllDepartments() {
+  const sql = `SELECT * FROM department`;
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.table(result);
+    // restart the application
+    employeeTracker();
+  });
+}
