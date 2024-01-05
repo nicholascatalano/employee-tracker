@@ -83,9 +83,10 @@ function viewRoles() {
   });
 }
 
+// function to view all employees in database
 function viewEmployees() {
-  const sql = `SELECT employees.id, employees.first_name, employees.last_name, roles.title AS title, departments.name AS department, roles.salary AS salary, employees.manager_id AS managerID
-  FROM employees JOIN roles ON employees.role_id = employees.id`;
+  const sql =
+    "SELECT employees.id, employees.first_name, employees.last_name, roles.title AS title, departments.name AS department, roles.salary AS salary, employees.manager_id AS managerID FROM employees LEFT JOIN roles ON employees.role_id = employees.id";
 
   db.query(sql, (err, result) => {
     if (err) throw err;
@@ -95,6 +96,7 @@ function viewEmployees() {
   });
 }
 
+// function to add a department to the database
 function addDepartment() {
   inquirer
     .prompt({
@@ -103,13 +105,58 @@ function addDepartment() {
       message: "What is the name of your department:",
     })
     .then((answer) => {
-      console.log(answer.name);
       const sql = `INSERT INTO departments (name) VALUES ("${answer.name}")`;
-      db.query(sql, (err, res) => {
+      db.query(sql, (err, result) => {
         if (err) throw err;
         console.log(`Added department ${answer.name} to the database!`);
         // restart the application
         employeeTracker();
       });
     });
+}
+
+function addRole() {
+  let departmentArray = [];
+  db.query(`SELECT * FROM departments`, function (err, results) {
+    for (let i = 0; i < results.length; i++) {
+      departmentArray.push(results[i].name);
+    }
+    return inquirer
+      .prompt([
+        {
+          type: "input",
+          message: "What is the name of the new role?",
+          name: "title",
+        },
+        {
+          type: "input",
+          message: "What is the salary of the new role?",
+          name: "salary",
+        },
+        {
+          type: "list",
+          message: "What department is the role under?",
+          name: "department",
+          choices: departmentArray,
+        },
+      ])
+      .then((data) => {
+        // Get's department id
+        db.query(
+          `SELECT id FROM departments WHERE departments.name = ?`,
+          data.department,
+          (err, results) => {
+            let department_id = results[0].id;
+            db.query(
+              `INSERT INTO roles(title, salary, department_id) VALUES (?,?,?)`,
+              [data.title, data.salary, department_id],
+              (err, results) => {
+                console.log("\nNew role added!");
+                viewRoles();
+              }
+            );
+          }
+        );
+      });
+  });
 }
