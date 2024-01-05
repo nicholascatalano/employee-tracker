@@ -249,7 +249,7 @@ function addEmployee() {
                       [first_name, last_name, role_id, hasManager],
                       (err, results) => {
                         console.log("\nNew employee added.");
-                        // viewEmployees();
+                        viewEmployees();
                       }
                     );
                   }
@@ -277,6 +277,65 @@ function addEmployee() {
               }
             );
           }
+        });
+    });
+  });
+}
+
+// function to update employee record
+function updateEmployeeRole() {
+  const rolesArray = [];
+  const employeesArray = [];
+
+  // populates roles into rolesArray
+  db.query(`SELECT * FROM roles`, function (err, results) {
+    for (let i = 0; i < results.length; i++) {
+      rolesArray.push(results[i].title);
+    }
+    // populates employees into employeesArray
+    db.query(`SELECT * FROM employees`, function (err, results) {
+      for (let i = 0; i < results.length; i++) {
+        let employeeName = `${results[i].first_name} ${results[i].last_name}`;
+        employeesArray.push(employeeName);
+      }
+      return inquirer
+        .prompt([
+          {
+            type: "list",
+            message: "Which employee do you want to update?",
+            name: "employee",
+            choices: employeesArray,
+          },
+          {
+            type: "list",
+            message: "What is the employee's new role?",
+            name: "role",
+            choices: rolesArray,
+          },
+        ])
+        .then((data) => {
+          // get role id
+          db.query(
+            `SELECT id FROM roles WHERE roles.title = ?;`,
+            data.role,
+            (err, results) => {
+              role_id = results[0].id;
+              db.query(
+                `SELECT id FROM employees WHERE employees.first_name = ? AND employees.last_name = ?;`,
+                data.employee.split(" "),
+                (err, results) => {
+                  db.query(
+                    `UPDATE employees SET role_id = ? WHERE id = ?;`,
+                    [role_id, results[0].id],
+                    (err, results) => {
+                      console.log("\nEmployee role updated.");
+                      viewEmployees();
+                    }
+                  );
+                }
+              );
+            }
+          );
         });
     });
   });
