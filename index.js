@@ -94,3 +94,22 @@ function viewEmployees() {
     employeeTracker();
   });
 }
+
+function addDepartment() {
+  inquirer
+    .prompt({
+      type: "input",
+      name: "name",
+      message: "What is the name of your department:",
+    })
+    .then((answer) => {
+      console.log(answer.name);
+      const sql = `INSERT INTO departments (name) VALUES ("${answer.name}")`;
+      db.query(sql, (err, res) => {
+        if (err) throw err;
+        console.log(`Added department ${answer.name} to the database!`);
+        // restart the application
+        employeeTracker();
+      });
+    });
+}
