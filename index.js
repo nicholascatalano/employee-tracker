@@ -74,7 +74,19 @@ function viewDepartments() {
 // function to view roles in database
 function viewRoles() {
   const sql =
-    "SELECT roles.id, roles.title, departments.name AS departmentName, roles.salary FROM roles JOIN departments on roles.department_id = departments.id";
+    "SELECT roles.id, roles.title, departments.name AS department, roles.salary FROM roles JOIN departments ON roles.department_id = departments.id";
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.table(result);
+    // restart the application
+    employeeTracker();
+  });
+}
+
+function viewEmployees() {
+  const sql = `SELECT employees.id, employees.first_name, employees.last_name, roles.title AS title, departments.name AS department, roles.salary AS salary, employees.manager_id AS managerID
+  FROM employees JOIN roles ON employees.role_id = employees.id`;
+
   db.query(sql, (err, result) => {
     if (err) throw err;
     console.table(result);
