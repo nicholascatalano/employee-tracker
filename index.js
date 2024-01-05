@@ -85,8 +85,11 @@ function viewRoles() {
 
 // function to view all employees in database
 function viewEmployees() {
-  const sql =
-    "SELECT employees.id, employees.first_name, employees.last_name, roles.title AS title, departments.name AS department, roles.salary AS salary, employees.manager_id AS managerID FROM employees LEFT JOIN roles ON employees.role_id = employees.id";
+  const sql = `SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.name AS department, roles.salary, CONCAT(manager.first_name,' ',manager.last_name) AS Manager
+    FROM employees 
+    JOIN roles ON employees.role_id = roles.id
+    JOIN departments ON roles.department_id = departments.id
+    LEFT JOIN employees manager ON employees.manager_id = manager.id`;
 
   db.query(sql, (err, result) => {
     if (err) throw err;
@@ -160,3 +163,5 @@ function addRole() {
       });
   });
 }
+
+// function to add an employee
