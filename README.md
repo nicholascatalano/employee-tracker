@@ -36,6 +36,7 @@ https://youtu.be/NYziqBNo_T0
 This project is licensed under the [MIT](https://opensource.org/licenses/MIT) license.
 
 ## Image
+![image](https://github.com/nicholascatalano/employee-tracker/assets/149517751/245747c8-1a08-47b5-ba03-46a822aad9b5)
 
 ## Questions
 
