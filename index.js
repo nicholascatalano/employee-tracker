@@ -165,3 +165,119 @@ function addRole() {
 }
 
 // function to add an employee
+function addEmployee() {
+  const rolesArray = [];
+  const employeesArray = [];
+
+  // populates roles into rolesArray
+  db.query(`SELECT * FROM roles`, function (err, results) {
+    for (let i = 0; i < results.length; i++) {
+      rolesArray.push(results[i].title);
+    }
+    // populates employees into employeesArray
+    db.query(`SELECT * FROM employees`, function (err, results) {
+      for (let i = 0; i < results.length; i++) {
+        let employeeName = `${results[i].first_name} ${results[i].last_name}`;
+        employeesArray.push(employeeName);
+      }
+      return inquirer
+        .prompt([
+          {
+            type: "input",
+            message: "What is the employee's first name?",
+            name: "first_name",
+          },
+          {
+            type: "input",
+            message: "What is the employee's last name?",
+            name: "last_name",
+          },
+          {
+            type: "list",
+            message: "What is the employee's role?",
+            name: "role",
+            choices: rolesArray,
+          },
+          {
+            type: "list",
+            message: "Does the employee have a manager?",
+            name: "has_manager",
+            choices: ["Yes", "No"],
+          },
+        ])
+        .then((data) => {
+          let roleTitle = data.role;
+          let first_name = data.first_name;
+          let last_name = data.last_name;
+          let role_id = "";
+          let hasManager = "";
+          // populates role id
+          db.query(
+            `SELECT id FROM roles WHERE roles.title = ?`,
+            data.role,
+            (err, results) => {
+              role_id = results[0].id;
+            }
+          );
+          if (data.has_manager === "Yes") {
+            return inquirer
+              .prompt([
+                {
+                  type: "list",
+                  message: "Please select the employees' manager.",
+                  name: "manager",
+                  choices: employeesArray,
+                },
+              ])
+              .then((data) => {
+                // get role id
+                db.query(
+                  `SELECT id FROM roles WHERE roles.title = ?`,
+                  roleTitle,
+                  (err, results) => {
+                    role_id = results[0].id;
+                  }
+                );
+                db.query(
+                  `SELECT id FROM employees WHERE employees.first_name = ? AND employees.last_name = ?;`,
+                  data.manager.split(" "),
+                  (err, results) => {
+                    hasManager = results[0].id;
+                    db.query(
+                      `INSERT INTO employees (first_name, last_name, role_id, manager_id) 
+                          VALUES (?,?,?,?)`,
+                      [first_name, last_name, role_id, hasManager],
+                      (err, results) => {
+                        console.log("\nNew employee added.");
+                        // viewEmployees();
+                      }
+                    );
+                  }
+                );
+              });
+          } else {
+            // sets manager to null
+            manager = null;
+            // get role id
+            db.query(
+              `SELECT id FROM roles WHERE roles.title = ?`,
+              roleTitle,
+              (err, results) => {
+                role_id = results[0].id;
+
+                db.query(
+                  `INSERT INTO employees (first_name, last_name, role_id, manager_id) 
+                      VALUES (?,?,?,?)`,
+                  [data.first_name, data.last_name, role_id, manager],
+                  (err, results) => {
+                    console.log("\nNew employee added. See below:");
+                    viewEmployees();
+                  }
+                );
+              }
+            );
+          }
+        });
+    });
+  });
+}
