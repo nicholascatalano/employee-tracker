@@ -32,13 +32,13 @@ const employeeTracker = function () {
     .then((answer) => {
       switch (answer.prompt) {
         case "View All Departments":
-          viewAllDepartments();
+          viewDepartments();
           break;
         case "View All Roles":
-          viewAllRoles();
+          viewRoles();
           break;
         case "View All Employees":
-          viewAllEmployees();
+          viewEmployees();
           break;
         case "Add a Department":
           addDepartment();
@@ -52,8 +52,8 @@ const employeeTracker = function () {
         case "Update an Employee Role":
           updateEmployeeRole();
           break;
-        case "Exit":
-          connection.end();
+        case "Quit":
+          db.end();
           console.log("Thank you!");
           break;
       }
@@ -61,8 +61,20 @@ const employeeTracker = function () {
 };
 
 // function to view all departments
-function viewAllDepartments() {
-  const sql = `SELECT * FROM department`;
+function viewDepartments() {
+  const sql = `SELECT * FROM departments`;
+  db.query(sql, (err, result) => {
+    if (err) throw err;
+    console.table(result);
+    // restart the application
+    employeeTracker();
+  });
+}
+
+// function to view roles in database
+function viewRoles() {
+  const sql =
+    "SELECT roles.id, roles.title, departments.name AS departmentName, roles.salary FROM roles JOIN departments on roles.department_id = departments.id";
   db.query(sql, (err, result) => {
     if (err) throw err;
     console.table(result);
